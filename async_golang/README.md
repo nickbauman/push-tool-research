@@ -1,3 +1,5 @@
+The Go language compiler requires very strict layout of your code. Therefore this language package looks the way it does.
+
 The following is my `go env` output:
 
     nick@nickb-gup:~/workspaces/push-tool-research/async_golang$ go env
