@@ -21,6 +21,7 @@ news/settings/local.py
 *.orig
 *.class
 *.jar
+*.a
 .ropeproject
 media
 .coverage
@@ -29,3 +30,4 @@ reports
 htmlcov
 deployment/.vagrant
 logs/logfile.*
+core

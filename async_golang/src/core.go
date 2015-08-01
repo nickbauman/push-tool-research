@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bench/client"
-	"bench/server"
+	"bench"
 	"fmt"
 	"os"
+  "strconv"
 )
 
 func useage() {
@@ -22,8 +22,9 @@ func main() {
 		if firstArg == "client" {
 			if len(secondArg) > 1 {
 				thirdArg := argsWithoutProg[2]
-				fmt.Printf("running client against %s\n", secondArg, thirdArg)
-				client.Run(secondArg, thirdArg)
+        iterations, _ := strconv.ParseInt(thirdArg, 0, 64)
+        fmt.Printf("running client against %s:%s\n", secondArg, thirdArg)
+				bench.RunClient(secondArg, iterations)
 			}
 		} else if firstArg == "server" {
 			fmt.Printf("running server on %s\n", secondArg)

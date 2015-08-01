@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func Run(url string, num_iterations int) {
+func RunClient(url string, num_iterations int64) {
 	//results := make(map[int]int)
 
 	resp, err := http.Get(url)
