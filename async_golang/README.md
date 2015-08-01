@@ -1,0 +1,2 @@
+
+GOMAXPROCS=8
