@@ -15,6 +15,7 @@ func RunClient(url string, num_iterations int64) {
 
 	if err != nil {
 		// do something
+    fmt.Printf("error %+v", err)
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
