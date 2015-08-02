@@ -11,7 +11,7 @@ From within the root of the `async_golang` sub project, run
 The Go language compiler requires very strict layout of your code and
 environment. Therefore this language package looks the way it does.
 
-The following is my `go env` output:
+The following is my `go env` output, YMMV:
 
     nick@nickb-gup:~/workspaces/push-tool-research/async_golang$ go env
     GOARCH="amd64"
@@ -31,7 +31,21 @@ The following is my `go env` output:
     CGO_ENABLED="1"
     GOMAXPROCS=8
 
-YMMV
+The following is my directory structure, YMMV:
+
+    ├── bandi.sh
+    ├── bin
+    ├── main
+    ├── pkg
+    │   └── linux_amd64
+    │       └── bench.a
+    ├── README.md
+    └── src
+        ├── bench
+        │   ├── client.go
+        │   └── server.go
+        └── main.go
+
 
 ## Benchmarking
 
@@ -46,5 +60,5 @@ Benching the server or client is as easy as
 
     ./main client localhost:8080 10000000
 
-Which will go after a server running on your local 8080 for 10000000, reporting
-the benchmarks using STDOUT.
+Which will go after a server running on your local 8080 for 10000000 iterations,
+reporting the benchmarks using STDOUT.
