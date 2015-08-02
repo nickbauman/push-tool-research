@@ -4,7 +4,7 @@ import (
 	"bench"
 	"fmt"
 	"os"
-  "strconv"
+	"strconv"
 )
 
 func useage() {
@@ -22,13 +22,13 @@ func main() {
 		if firstArg == "client" {
 			if len(secondArg) > 1 {
 				thirdArg := argsWithoutProg[2]
-        iterations, _ := strconv.ParseInt(thirdArg, 0, 64)
-        fmt.Printf("running client against %s:%s\n", secondArg, thirdArg)
+				iterations, _ := strconv.ParseInt(thirdArg, 0, 64)
+				fmt.Printf("running client against %s:%s\n", secondArg, thirdArg)
 				bench.RunClient(secondArg, iterations)
 			}
 		} else if firstArg == "server" {
 			fmt.Printf("running server on %s\n", secondArg)
-      bench.RunServer(secondArg)
+			bench.RunServer(secondArg)
 		} else {
 			useage()
 		}

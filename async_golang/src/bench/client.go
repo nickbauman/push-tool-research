@@ -1,35 +1,57 @@
 package bench
 
 import (
+	"bytes"
 	"fmt"
-  "bytes"
 	"io/ioutil"
 	"net/http"
 )
 
+func makeRequests(iterations int64, url string) <-chan *http.Response {
+	out := make(chan *http.Response)
+	go func() {
+		for i := int64(0); i < iterations; i++ {
+			resp, _ := http.Get(url)
+			out <- resp
+		}
+		close(out)
+	}()
+	return out
+}
+
+func processResponses(responsesChannel <-chan *http.Response, results map[int]int) (map[int]int, <-chan *http.Response) {
+	go func() {
+		for resp := range responsesChannel {
+			val, ok := results[resp.StatusCode]
+			if ok {
+				results[resp.StatusCode] = val + 1
+			} else {
+				results[resp.StatusCode] = 1
+			}
+			defer resp.Body.Close()
+			ioutil.ReadAll(resp.Body)
+		}
+	}()
+	return results, responsesChannel
+}
+
 func RunClient(host_and_port string, num_iterations int64) {
 	results := make(map[int]int)
-  var buffer bytes.Buffer
+	var buffer bytes.Buffer
 
-  buffer.WriteString("http://")
-  buffer.WriteString(host_and_port)
-  url := buffer.String()
+	buffer.WriteString("http://")
+	buffer.WriteString(host_and_port)
+	url := buffer.String()
 
-  fmt.Printf("%s\n", url)
+	fmt.Printf("running %d against %s\n", num_iterations, url)
 
-  for i := int64(0); i<num_iterations; i++ {
-		resp, _ := http.Get(url)
-    //fmt.Printf("err: %+v\n", err)
-    //fmt.Printf("resp: %+v\n", resp)
-    val, ok := results[resp.StatusCode]
-    if(ok) {
-      results[resp.StatusCode] = val + 1
-    } else {
-      results[resp.StatusCode] = 1
+  res, resp_chan := processResponses(makeRequests(num_iterations, url), results)
+
+  for n := range resp_chan {
+    if (&n == nil) {
+      fmt.Printf("nil n")
     }
-	  defer resp.Body.Close()
-	  ioutil.ReadAll(resp.Body)
-	}
+  }
+  fmt.Printf("results: %+v\n", res)
 
-  fmt.Printf("results: %+v\n", results)
 }
