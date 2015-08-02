@@ -1,4 +1,15 @@
-The Go language compiler requires very strict layout of your code. Therefore this language package looks the way it does.
+# Go Client and Server for benchmarking
+
+## Compiling
+
+From within the root of the `async_golang` sub project, run
+
+    ./bandi.sh
+
+### Issues compiling
+
+The Go language compiler requires very strict layout of your code and
+environment. Therefore this language package looks the way it does.
 
 The following is my `go env` output:
 
@@ -21,3 +32,19 @@ The following is my `go env` output:
     GOMAXPROCS=8
 
 YMMV
+
+## Benchmarking
+
+Starting the server is as easy as
+
+    ./main server localhost:8080
+
+from within the sub project root. This binds the server the `localhost` on port
+8080, of course.
+
+Benching the server or client is as easy as
+
+    ./main client localhost:8080 10000000
+
+Which will go after a server running on your local 8080 for 10000000, reporting
+the benchmarks using STDOUT.
