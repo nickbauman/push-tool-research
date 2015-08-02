@@ -28,7 +28,7 @@ func main() {
 			}
 		} else if firstArg == "server" {
 			fmt.Printf("running server on %s\n", secondArg)
-
+      bench.RunServer(secondArg)
 		} else {
 			useage()
 		}
