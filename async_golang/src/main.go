@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+  "time"
 )
 
 func useage() {
@@ -23,8 +24,21 @@ func main() {
 			if len(secondArg) > 1 {
 				thirdArg := argsWithoutProg[2]
 				iterations, _ := strconv.ParseInt(thirdArg, 0, 64)
-				fmt.Printf("running client against %s:%s\n", secondArg, thirdArg)
+
+        thenTime := time.Now()
+        thenNanos := thenTime.UnixNano()
+        thenMillis := thenNanos / 1000000
+
 				bench.RunClient(secondArg, iterations)
+
+        nowTime := time.Now()
+        nowNanos := nowTime.UnixNano()
+        nowMillis := nowNanos / 1000000
+
+        duration := nowMillis - thenMillis
+        req_sec := iterations / (duration / 1000.0)
+
+        fmt.Printf("Completed: Took %d ms, %d req/sec\n", duration, req_sec)
 			}
 		} else if firstArg == "server" {
 			fmt.Printf("running server on %s\n", secondArg)
