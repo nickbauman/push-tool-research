@@ -19,20 +19,18 @@ func makeRequests(iterations int64, url string) <-chan *http.Response {
 	return out
 }
 
-func processResponses(responsesChannel <-chan *http.Response, results map[int]int) (map[int]int, <-chan *http.Response) {
-	go func() {
-		for resp := range responsesChannel {
-			val, ok := results[resp.StatusCode]
-			if ok {
-				results[resp.StatusCode] = val + 1
-			} else {
-				results[resp.StatusCode] = 1
-			}
-			defer resp.Body.Close()
-			ioutil.ReadAll(resp.Body)
+func processResponses(responsesChannel <-chan *http.Response, results map[int]int) map[int]int {
+	for resp := range responsesChannel {
+		val, ok := results[resp.StatusCode]
+		if ok {
+			results[resp.StatusCode] = val + 1
+		} else {
+			results[resp.StatusCode] = 1
 		}
-	}()
-	return results, responsesChannel
+		defer resp.Body.Close()
+		ioutil.ReadAll(resp.Body)
+	}
+	return results
 }
 
 func RunClient(host_and_port string, num_iterations int64) {
@@ -45,13 +43,7 @@ func RunClient(host_and_port string, num_iterations int64) {
 
 	fmt.Printf("running %d against %s\n", num_iterations, url)
 
-  res, resp_chan := processResponses(makeRequests(num_iterations, url), results)
+	res := processResponses(makeRequests(num_iterations, url), results)
 
-  for n := range resp_chan {
-    if (&n == nil) {
-      fmt.Printf("nil n")
-    }
-  }
-  fmt.Printf("results: %+v\n", res)
-
+	fmt.Printf("results: %+v\n", res)
 }
