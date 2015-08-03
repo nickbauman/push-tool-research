@@ -5,15 +5,19 @@ import (
   "fmt"
   "io/ioutil"
 //  "os"
-//  "time"
+  "time"
 )
 
-const REQUESTS int = 100000 // blows up right now if too big...
-const WORKERS int = 1024
+const REQUESTS int = 100000 // blows up right now if too big when WORKERS > 2...
+const WORKERS int = 1      // also blows up if too big.
 
 type HttpResponse struct {
   response *http.Response
   err error
+}
+
+type DumbResponse struct {
+  value int
 }
 
 // provides a future-like http GET request function
@@ -22,8 +26,11 @@ func asyncHttpGet(url string) chan *HttpResponse {
   ch := make(chan *HttpResponse)
   go func() {
     response, err := http.Get(url)
-    defer response.Body.Close()
+    if err != nil {
+      fmt.Print("err => ", err, "\n")
+    }
     ioutil.ReadAll(response.Body)
+    response.Body.Close()
     ch <- &HttpResponse{response, err}
     close(ch)
   }()
@@ -39,10 +46,10 @@ func RunRequests(work_chan chan (chan *HttpResponse), url string) {
 
 func main() {
   work_chan := make(chan (chan *HttpResponse), WORKERS)
+  start_time := time.Now()
   go RunRequests(work_chan, "http://localhost:6060")
   result_map := make(map[int]int)
   for http_response_chan := range work_chan {
-    fmt.Print("Hello!\n")
     http_response := <-http_response_chan
     old_result, ok := result_map[http_response.response.StatusCode]
     if !ok {
@@ -50,9 +57,17 @@ func main() {
     }
     result_map[http_response.response.StatusCode] = old_result + 1
   }
-  fmt.Print("result_map => ", result_map)
-  /*for i := 0; i < 100000; i++ {
+  fmt.Print("Took time: ", time.Now().Sub(start_time), "\n")
+  fmt.Print("result_map => ", result_map, "\n")
+
+  /*for i := 0; i < 1; i++ {
     result := <- asyncHttpGet("http://localhost:6060")
     fmt.Print("Status => ", result.response.StatusCode, "\n")
+  }*/
+
+  /*my_chan := make(chan (chan *HttpResponse), 32)
+  go RunRequests(my_chan, "http://localhost:6060")
+  for result_chan := range my_chan {
+    fmt.Print("Chan-in-Chan Status => ", (<- result_chan).response.StatusCode, "\n")
   }*/
 }
