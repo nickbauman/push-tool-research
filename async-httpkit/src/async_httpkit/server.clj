@@ -1,9 +1,7 @@
 (ns async-httpkit.server
-  (:require [clojure.core.async :refer [chan <!! <! >! close! go go-loop] :as async]
-            [org.httpkit.server :as server]))
+  (:require [org.httpkit.server :as server]))
 
 (defn app [req]
-  ;(print ".")
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    "hello world!"})

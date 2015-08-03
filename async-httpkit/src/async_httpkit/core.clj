@@ -8,7 +8,7 @@
   (if (seq args)
     (case (first args)
       "client" (if (second args)
-                 (client/benchN 3 (second args))
+                 (client/bench-n 3 (second args))
                  (println "client can't connect to nil endpoint"))
       "client2" (if-let[url (second args)]
                   (client2/bench-n 3 url)

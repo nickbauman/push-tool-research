@@ -9,9 +9,9 @@
 (defonce WORKERS 4)
 
 (defn run-requests
-  [work-chan, endpoint_url]
+  [work-chan, url]
   (go (dotimes [_ REQUESTS]
-        (>! work-chan (http/get endpoint_url)))
+        (>! work-chan (http/get url)))
       (close! work-chan)))
 
 (defn process-responses
@@ -25,10 +25,10 @@
       results)))
 
 (defn bench
-  [endpoint_url]
+  [url]
   (let [start-time (System/currentTimeMillis)
         work-chan (chan CONNECTIONS)
-        _ (run-requests work-chan endpoint_url)
+        _ (run-requests work-chan url)
         all-workers (doall (repeatedly WORKERS #(process-responses work-chan)))
         all-results (<!! (async/into [] (async/merge all-workers)))
         duration (double (/ (- (System/currentTimeMillis) start-time) 1000))
@@ -38,8 +38,8 @@
     (println "Req/Sec:" (/ (reduce + (vals results)) duration))
     (println "That took:" duration "seconds")))
 
-(defn benchN
-  [num_runs endpoint_url]
-  (println "starting" num_runs "runs")
-  (dotimes [_ num_runs]
-    (bench endpoint_url)))
+(defn bench-n
+  [num-runs url]
+  (println "client starting" num-runs "runs")
+  (dotimes [_ num-runs]
+    (bench url)))
