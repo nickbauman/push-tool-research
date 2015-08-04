@@ -8,8 +8,8 @@ import (
   "time"
 )
 
-const REQUESTS int = 100000 // blows up right now if too big when WORKERS > 2...
-const WORKERS int = 1      // also blows up if too big.
+const REQUESTS int = 100000 // blows up if too big and WORKERS > 0...
+const WORKERS int = 1       // also blows up if too big.
 
 type HttpResponse struct {
   response *http.Response
