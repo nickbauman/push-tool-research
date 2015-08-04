@@ -47,7 +47,7 @@ func RunRequests(work_chan chan (chan *HttpResponse), url string) {
 func main() {
   work_chan := make(chan (chan *HttpResponse), WORKERS)
   start_time := time.Now()
-  go RunRequests(work_chan, "http://localhost:6060")
+  go RunRequests(work_chan, "http://10.12.1.30:6060")
   result_map := make(map[int]int)
   for http_response_chan := range work_chan {
     http_response := <-http_response_chan
@@ -57,7 +57,10 @@ func main() {
     }
     result_map[http_response.response.StatusCode] = old_result + 1
   }
-  fmt.Print("Took time: ", time.Now().Sub(start_time), "\n")
+  duration := time.Now().Sub(start_time)
+
+  fmt.Print("Took time: ", duration, "\n")
+  fmt.Print("Req/Sec: ", float64(REQUESTS)/duration.Seconds(), "\n")
   fmt.Print("result_map => ", result_map, "\n")
 
   /*for i := 0; i < 1; i++ {
