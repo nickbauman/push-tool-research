@@ -8,8 +8,8 @@ import (
   "time"
 )
 
-const REQUESTS int = 100000 // blows up if too big and WORKERS > 0...
-const WORKERS int = 1       // also blows up if too big.
+const REQUESTS int = 1000000
+const WORKERS int = 512 // blows up if this is too big. e.g.: 1024 (this is just the go channel size, not technically the number of "workers")
 
 type HttpResponse struct {
   response *http.Response
@@ -45,9 +45,10 @@ func RunRequests(work_chan chan (chan *HttpResponse), url string) {
 }
 
 func main() {
-  work_chan := make(chan (chan *HttpResponse), WORKERS)
   start_time := time.Now()
-  go RunRequests(work_chan, "http://10.12.1.30:6060")
+  http.DefaultTransport.(*http.Transport).MaxIdleConnsPerHost = 1024
+  work_chan := make(chan (chan *HttpResponse), WORKERS)
+  go RunRequests(work_chan, "http://localhost:6060")
   result_map := make(map[int]int)
   for http_response_chan := range work_chan {
     http_response := <-http_response_chan
@@ -62,15 +63,4 @@ func main() {
   fmt.Print("Took time: ", duration, "\n")
   fmt.Print("Req/Sec: ", float64(REQUESTS)/duration.Seconds(), "\n")
   fmt.Print("result_map => ", result_map, "\n")
-
-  /*for i := 0; i < 1; i++ {
-    result := <- asyncHttpGet("http://localhost:6060")
-    fmt.Print("Status => ", result.response.StatusCode, "\n")
-  }*/
-
-  /*my_chan := make(chan (chan *HttpResponse), 32)
-  go RunRequests(my_chan, "http://localhost:6060")
-  for result_chan := range my_chan {
-    fmt.Print("Chan-in-Chan Status => ", (<- result_chan).response.StatusCode, "\n")
-  }*/
 }
