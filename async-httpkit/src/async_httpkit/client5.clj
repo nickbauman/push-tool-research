@@ -1,10 +1,12 @@
-(ns async-httpkit.client3
+(ns async-httpkit.client5
   (:require [clojure.core.async :refer [chan <! <!! >! close! go go-loop]]
-            [org.httpkit.client :as http]))
+            [clj-http.client :as http]))
 
-(defonce REQUESTS 1000000)
-(defonce WORKERS 128)
+(defonce REQUESTS 100000)
+(defonce WORKERS 256)
 (defonce WORKSIZE 1024)
+
+(defonce POOL (clj-http.conn-mgr/make-reusable-conn-manager {:timeout 120 :threads 256 :default-per-route 256}))
 
 (defn run-requests
   [work-chan url]
@@ -16,7 +18,8 @@
   [work-chan result-chan]
   (go-loop [url (<! work-chan)]
     (when-not (nil? url)
-      (>! result-chan @(http/get url))
+      (>! result-chan
+          (http/get url {:connection-manager POOL}))
       (recur (<! work-chan)))))
 
 (defn process-results
@@ -52,4 +55,5 @@
   [num-runs url]
   (println "client2 starting" num-runs "runs")
   (dotimes [_ num-runs]
-    (bench url)))
+    (bench url))
+  (clj-http.conn-mgr/shutdown-manager POOL))

@@ -2,7 +2,7 @@
   (:require [clojure.core.async :refer [chan <!! <! >! close! go go-loop] :as async]
             [org.httpkit.client :as http]))
 
-; for clojure http-kit client benchmarks
+; for clojure http-kit client benchmarks. Uses 4 separate workers to process the responses.
 
 (defonce REQUESTS 1000000)
 (defonce CONNECTIONS 1024)
